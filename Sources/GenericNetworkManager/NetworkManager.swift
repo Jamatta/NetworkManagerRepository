@@ -9,6 +9,7 @@ public enum APIError: Error {
 }
 
 public struct NetworkManager {
+    public init() {}
     public func fetchData<T: Decodable>(from url: URL, completion: @escaping (Result<T, Error>) -> Void) {
         URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data, error == nil else {
