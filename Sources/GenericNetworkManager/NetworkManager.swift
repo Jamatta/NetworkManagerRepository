@@ -9,39 +9,24 @@ public enum APIError: Error {
 }
 
 public struct NetworkManager {
-    public static func requestData<T: Decodable>(from urlString: String, responseType: T.Type, completion: @escaping (Result<T, APIError>) -> Void) {
-        guard let url = URL(string: urlString) else {
-            completion(.failure(.invalidURL))
-            return
-        }
-
-        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
-            if let error = error {
-                print("Error: \(error)")
-                completion(.failure(.requestFailed))
-                return
-            }
-
-            guard let httpResponse = response as? HTTPURLResponse,
-                  (200...299).contains(httpResponse.statusCode) else {
-                completion(.failure(.invalidResponse))
-                return
-            }
-
-            guard let data = data else {
-                completion(.failure(.invalidData))
+    public func fetchData<T: Decodable>(from url: URL, responseType: T.Type, completion: @escaping (Result<T, Error>) -> Void) {
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            guard let data = data, error == nil else {
+                if let error = error {
+                    completion(.failure(error))
+                } else {
+                    completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid Data"])))
+                }
                 return
             }
 
             do {
-                let decodedResponse = try JSONDecoder().decode(T.self, from: data)
-                completion(.success(decodedResponse))
+                let decodedData = try JSONDecoder().decode(T.self, from: data)
+                completion(.success(decodedData))
             } catch {
-                print("Error decoding JSON: \(error)")
-                completion(.failure(.decodingError))
+                completion(.failure(error))
             }
-        }
-
-        task.resume()
+        }.resume()
     }
+
 }
