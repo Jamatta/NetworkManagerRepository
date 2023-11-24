@@ -1,6 +1,6 @@
 import Foundation
 
-enum APIError: Error {
+public enum APIError: Error {
     case invalidURL
     case requestFailed
     case invalidResponse
@@ -8,8 +8,8 @@ enum APIError: Error {
     case decodingError
 }
 
-struct NetworkManager {
-    static func requestData<T: Decodable>(from urlString: String, responseType: T.Type, completion: @escaping (Result<T, APIError>) -> Void) {
+public struct NetworkManager {
+    public static func requestData<T: Decodable>(from urlString: String, responseType: T.Type, completion: @escaping (Result<T, APIError>) -> Void) {
         guard let url = URL(string: urlString) else {
             completion(.failure(.invalidURL))
             return
