@@ -21,14 +21,16 @@ public struct NetworkManager {
                 }
                 return
             }
-
+            
             do {
                 let decodedData = try JSONDecoder().decode(T.self, from: data)
-                completion(.success(decodedData))
+                DispatchQueue.main.async {
+                    completion(.success(decodedData))
+                }
             } catch {
                 completion(.failure(error))
             }
         }.resume()
     }
-
+    
 }
